@@ -24,12 +24,14 @@ void *validar_linha(void *param) {
     for (int i = 0; i < N; i++) {
         if (seen[sudoku[row][i] - 1]) {
             printf("Linha %d inválida!\n", row + 1);
-            return NULL;
+            pthread_exit(NULL); // For failure
         }
         seen[sudoku[row][i] - 1] = 1;
     }
-    return NULL;
+    printf("Linha %d válida.\n", row + 1);
+    pthread_exit((void *)1); // For success
 }
+
 
 int main() {
     pthread_t threads[N];

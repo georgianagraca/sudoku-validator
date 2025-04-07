@@ -9,8 +9,8 @@ all: $(BIN)
 $(BIN): $(OBJ)
 	$(CC) $(CFLAGS) -o $(BIN) $(OBJ)
 
-sudoku.o: $(SRC)
-	$(CC) $(CFLAGS) -c $(SRC)
+$(OBJ): $(SRC)
+	$(CC) $(CFLAGS) -c $(SRC) -o $(OBJ)
 
 clean:
 	rm -f $(OBJ) $(BIN)

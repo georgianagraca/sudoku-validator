@@ -11,4 +11,6 @@ COPY src/python /app/python
 WORKDIR /app/c
 RUN make
 
-CMD ["./sudoku_validator"]
+ENTRYPOINT ["/app/c/sudoku_validator"]
+CMD []
+
