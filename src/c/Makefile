@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -pthread
 SRC = sudoku_validator.c
 OBJ = sudoku_validator.o
-BIN = sudoku-validator
+BIN = sudoku_validator
 
 all: $(BIN)
 
