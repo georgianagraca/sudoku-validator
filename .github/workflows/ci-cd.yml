@@ -1,0 +1,36 @@
+# Pipeline do GitHub Actions
+
+name: CI/CD for Sudoku Validator
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar dependências
+        run: sudo apt update && sudo apt install -y gcc make python3-tk
+
+      - name: Compilar o código C
+        run: |
+          cd src/c
+          make
+
+      - name: Testar Sudoku Validator
+        run: ./src/c/sudoku_validator
+
+      - name: Configurar Docker
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker build -t seu-usuario/sudoku-validator .
+          docker push seu-usuario/sudoku-validator
+
+      - name: Atualizar Servidor
+        run: |
+          ssh usuario@seu-servidor "docker pull seu-usuario/sudoku-validator && docker run --rm seu-usuario/sudoku-validator"
