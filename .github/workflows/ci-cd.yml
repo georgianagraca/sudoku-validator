@@ -39,7 +39,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy sudoku-validator \
-            --image us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator
+            --image us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated
