@@ -9,8 +9,7 @@ COPY src/c /app/c
 COPY src/python /app/python
 
 WORKDIR /app/c
-RUN make
+RUN make && ./sudoku_validator  # ← Adiciona execução de teste aqui. Falha se der erro.
 
 ENTRYPOINT ["/app/c/sudoku_validator"]
 CMD []
-
