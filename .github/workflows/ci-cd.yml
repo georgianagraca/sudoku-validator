@@ -32,13 +32,14 @@ jobs:
 
       - name: Build and Push Docker image to Google Container Registry
         run: |
-          docker build -t gcr.io/hardy-tenure-456214-m1/sudoku-validator -f docker/Dockerfile .
-          docker push gcr.io/hardy-tenure-456214-m1/sudoku-validator
+          docker build -t us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator -f docker/Dockerfile .
+          docker push us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator
+
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy sudoku-validator \
-            --image gcr.io/hardy-tenure-456214-m1/sudoku-validator \
+            --image us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated
