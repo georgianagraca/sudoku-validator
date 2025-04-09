@@ -30,6 +30,11 @@ jobs:
       - name: Configure Docker to use gcloud CLI
         run: gcloud auth configure-docker
 
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+      
+
       - name: Build and Push Docker image to Google Container Registry
         run: |
           docker build -t us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator -f docker/Dockerfile .
