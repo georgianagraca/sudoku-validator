@@ -1,51 +1,65 @@
-/*Código C para validação do Sudoku*/
-
 #include <stdio.h>
 #include <pthread.h>
+#include <stdlib.h>
 
-#define N 9  // Tamanho do Sudoku
+#define N 9
 
-int sudoku[N][N] = {
-    {5, 3, 4, 6, 7, 8, 9, 1, 2},
-    {6, 7, 2, 1, 9, 5, 3, 4, 8},
-    {1, 9, 8, 3, 4, 2, 5, 6, 7},
-    {8, 5, 9, 7, 6, 1, 4, 2, 3},
-    {4, 2, 6, 8, 5, 3, 7, 9, 1},
-    {7, 1, 3, 9, 2, 4, 8, 5, 6},
-    {9, 6, 1, 5, 3, 7, 2, 8, 4},
-    {2, 8, 7, 4, 1, 9, 6, 3, 5},
-    {3, 4, 5, 2, 8, 6, 1, 7, 9}
-};
+int sudoku[N][N];
+int resultado = 1;
+pthread_mutex_t lock;
 
 void *validar_linha(void *param) {
     int row = *(int *)param;
     int seen[N] = {0};
 
     for (int i = 0; i < N; i++) {
-        if (seen[sudoku[row][i] - 1]) {
-            printf("Linha %d inválida!\n", row + 1);
-            pthread_exit(NULL); // For failure
+        int val = sudoku[row][i];
+
+        // Verifica se o número está fora do intervalo ou repetido
+        if (val < 1 || val > 9 || seen[val - 1]) {
+            pthread_mutex_lock(&lock);
+            resultado = 0;
+            pthread_mutex_unlock(&lock);
+            pthread_exit(NULL);
         }
-        seen[sudoku[row][i] - 1] = 1;
+
+        seen[val - 1] = 1;
     }
-    printf("Linha %d válida.\n", row + 1);
-    pthread_exit((void *)1); // For success
+
+    pthread_exit(NULL);
 }
 
-
 int main() {
+    FILE *file = fopen("sudoku.txt", "r");
+    if (!file) {
+        perror("Erro ao abrir o arquivo sudoku.txt");
+        return 1;
+    }
+
+    // Lê a matriz do arquivo
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++)
+            fscanf(file, "%d", &sudoku[i][j]);
+
+    fclose(file);
+
     pthread_t threads[N];
     int indices[N];
 
+    pthread_mutex_init(&lock, NULL);
+
+    // Cria as threads
     for (int i = 0; i < N; i++) {
         indices[i] = i;
         pthread_create(&threads[i], NULL, validar_linha, &indices[i]);
     }
 
+    // Aguarda todas as threads finalizarem
     for (int i = 0; i < N; i++) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("Validação concluída!\n");
-    return 0;
+    pthread_mutex_destroy(&lock);
+
+    return resultado ? 0 : 1;
 }
