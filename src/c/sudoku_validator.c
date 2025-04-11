@@ -8,6 +8,14 @@ int sudoku[N][N];
 int resultado = 1;
 pthread_mutex_t lock;
 
+void get_puzzle(int rows, int cols, int *puzzle) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            puzzle[i * cols + j] = i + 1; 
+        }
+    }
+}
+
 void *validar_linha(void *param) {
     int row = *(int *)param;
     int seen[N] = {0};
@@ -29,7 +37,7 @@ void *validar_linha(void *param) {
     pthread_exit(NULL);
 }
 
-int main() {
+/*int main() {
     FILE *file = fopen("sudoku.txt", "r");
     if (!file) {
         perror("Erro ao abrir o arquivo sudoku.txt");
@@ -62,4 +70,4 @@ int main() {
     pthread_mutex_destroy(&lock);
 
     return resultado ? 0 : 1;
-}
+}*/

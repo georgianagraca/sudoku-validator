@@ -1,14 +1,17 @@
-python sudoku.py:
 import tkinter as ttk
+import ctypes
+import numpy as np
+import os
 
 class SudokuInterface:
-    def _init_(self, root):
+    def __init__(self, root):
         self.root = root
         self.root.title("Jogo Sudoku")
         self.create_grid()
         self.create_control_buttons()
         self.create_numbers_buttons()
         self.celula_selecionada = None 
+        self.lib = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "teste.so")) # Carregando a biblioteca sudoku em C
 
     # Valida a entrada digitada em cada célula para aceitar apenas um único número
     def number_validator(self, entry):
@@ -43,6 +46,7 @@ class SudokuInterface:
 
         # Cria o grid 9x9 do jogo Sudoku
         self.celulas = []
+        self.values = []
         for linha in range(9):
             linha_celulas = []
             for coluna in range(9):
@@ -74,9 +78,9 @@ class SudokuInterface:
         control_frame.pack(side=ttk.RIGHT, padx=20)
 
         # Botões de controle
-        ttk.Button(control_frame, text="Novo jogo", background='#2196f3', width=30).pack(pady=5) # Botão responsável por criar um novo jogo
+        ttk.Button(control_frame, text="Novo jogo", background='#2196f3', width=30, command=self.criar_jogo).pack(pady=5) # Botão responsável por criar um novo jogo
         ttk.Button(control_frame, text="Resolver", background='#4caf50', width=30).pack(pady=5) # Botão responsável por resolver o puzzle
-        ttk.Button(control_frame, text="Limpar", background='#f44336', width=30).pack(pady=5) # Botão responsável por limpar o puzzle
+        ttk.Button(control_frame, text="Limpar", background='#f44336', width=30, command=self.limpar_jogo).pack(pady=5) # Botão responsável por limpar o puzzle
         ttk.Button(control_frame, text="Verificar", background='#ffc107', width=30).pack(pady=5) # Botão responsável por validar o puzzle
 
     def create_numbers_buttons(self):
@@ -100,9 +104,36 @@ class SudokuInterface:
             ).pack(side=ttk.LEFT, padx=2, pady= 50)
 
 
-        
+    def criar_jogo(self):
 
-if _name_ == "_main_":
+        # Determinando os tipos de cada parametro da função ger_puzzle
+        self.lib.get_puzzle.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int))
+
+        # Cria matriz 9x9 
+        puzzle = (ctypes.c_int * (9 * 9))()
+
+        # Chamando a função 
+        self.lib.get_puzzle(9, 9, puzzle)
+
+        # Convertendo para numpy
+        np_puzzle = np.ctypeslib.as_array(puzzle).reshape(9, 9)
+
+        print("matriz recebida de c:")
+        print(np_puzzle)
+
+        for linha in range(9):
+            for coluna in range(9):
+                value = str(np_puzzle[linha][coluna]) if np_puzzle[linha][coluna] != 0 else ''
+                self.celulas[linha][coluna].delete(0, 'end')
+                self.celulas[linha][coluna].insert(0, value)
+
+    def limpar_jogo(self):
+        for linha in range(9):
+            for coluna in range(9):
+                self.celulas[linha][coluna].delete(0, 'end')
+
+
+if __name__ == "__main__":
     root = ttk.Tk()
     app = SudokuInterface(root)
-    root.mainloop()
+    root.mainloop()
