@@ -19,7 +19,14 @@ Para construir a imagem Docker a partir do `Dockerfile` localizado na pasta `doc
 ```bash
 docker build -t sudoku -f docker/Dockerfile .
 ```
-#### 2. Rodar o Container Docker
+
+#### 2. Permitir Acesso ao Servidor X 
+Antes de executar o container, no terminal rode o seguinte comando para liberar o acesso ao servidor X para o usuário `root`local:
+```bash
+xhost +local:root
+```
+
+#### 3. Rodar o Container Docker
 Após construir a imagem, rode o seguinte comando para iniciar o container e permitir que a interface gráfica seja exibida:
 
 ```bash
