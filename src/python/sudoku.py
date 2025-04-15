@@ -11,7 +11,14 @@ class SudokuInterface:
         self.create_control_buttons()
         self.create_numbers_buttons()
         self.celula_selecionada = None 
-        self.lib = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "teste.so")) # Carregando a biblioteca sudoku em C
+
+        # Carregando a biblioteca sudoku em C
+        if "DOCKER_ENV" in os.environ:
+            # Caso esteja no docker
+            self.lib = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "c", "sudoku_validator.so"))
+        else:
+            # Caso esteja executando diretamente no ambiente local
+            self.lib = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator.so"))
 
     # Valida a entrada digitada em cada célula para aceitar apenas um único número
     def number_validator(self, entry):
@@ -133,7 +140,3 @@ class SudokuInterface:
                 self.celulas[linha][coluna].delete(0, 'end')
 
 
-if __name__ == "__main__":
-    root = ttk.Tk()
-    app = SudokuInterface(root)
-    root.mainloop()
