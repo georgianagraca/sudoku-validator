@@ -1,15 +1,34 @@
-# Configuração do Docker
+FROM python:3.12
 
-FROM ubuntu:latest
-
-RUN apt update && apt install -y gcc python3 python3-tk make
-
+# Define o diretório de trabalho
 WORKDIR /app
-COPY src/c /app/c
-COPY src/python /app/python
 
+# Instala o GCC, o Make e ox11 para a interface
+RUN apt-get update && apt-get install -y gcc make python3 python3-tk x11-apps
+
+# Copia os arquivos C
+COPY ../src/c/ /app/c
+
+# Compila o .so usando make
 WORKDIR /app/c
-RUN make && ./sudoku_validator  # ← Adiciona execução de teste aqui. Falha se der erro.
+RUN make
 
-ENTRYPOINT ["/app/c/sudoku_validator"]
-CMD []
+# Copia os arquivos Python
+WORKDIR /app
+COPY ../src/python/ /app/
+
+# Copia o requirements.txt 
+COPY ../requirements.txt /app/
+
+# Instala as dependências necessárias
+RUN pip install -r requirements.txt
+
+# Configura a variável de ambiente
+ENV DOCKER_ENV=1
+
+# Configura a variável DISPLAY e o acesso ao servidor X a
+ENV DISPLAY=:0
+ENV XAUTHORITY=/root/.Xauthority
+
+# Inicia a aplicação
+CMD ["python", "app.py"]
