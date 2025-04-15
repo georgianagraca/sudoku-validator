@@ -1,19 +1,12 @@
 CC = gcc
-CFLAGS = -Wall -pthread
+CFLAGS = -Wall -pthread -fPIC
 SRC = sudoku_validator.c
-OBJ = sudoku_validator.o
-BIN = sudoku_validator
+SO = sudoku_validator.so
 
-all: $(BIN)
+all: $(SO)
 
-$(BIN): $(OBJ)
-	$(CC) $(CFLAGS) -o $(BIN) $(OBJ)
-
-$(OBJ): $(SRC)
-	$(CC) $(CFLAGS) -c $(SRC) -o $(OBJ)
+$(SO): $(SRC)
+	$(CC) $(CFLAGS) -shared -o $(SO) $(SRC)
 
 clean:
-	rm -f $(OBJ) $(BIN)
-
-run: all
-	./$(BIN)
+	rm -f $(SO)
