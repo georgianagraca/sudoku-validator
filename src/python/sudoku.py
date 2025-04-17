@@ -11,6 +11,8 @@ class SudokuInterface:
         self.create_control_buttons()
         self.create_numbers_buttons()
         self.celula_selecionada = None 
+        self.puzzle = None
+        self.solution = None
 
         # Carregando a biblioteca sudoku em C
         if "DOCKER_ENV" in os.environ:
@@ -86,7 +88,7 @@ class SudokuInterface:
 
         # Botões de controle
         ttk.Button(control_frame, text="Novo jogo", background='#2196f3', width=30, command=self.criar_jogo).pack(pady=5) # Botão responsável por criar um novo jogo
-        ttk.Button(control_frame, text="Resolver", background='#4caf50', width=30).pack(pady=5) # Botão responsável por resolver o puzzle
+        ttk.Button(control_frame, text="Resolver", background='#4caf50', width=30, command=self.resolver_jogo).pack(pady=5) # Botão responsável por resolver o puzzle
         ttk.Button(control_frame, text="Limpar", background='#f44336', width=30, command=self.limpar_jogo).pack(pady=5) # Botão responsável por limpar o puzzle
         ttk.Button(control_frame, text="Verificar", background='#ffc107', width=30).pack(pady=5) # Botão responsável por validar o puzzle
 
@@ -114,29 +116,38 @@ class SudokuInterface:
     def criar_jogo(self):
 
         # Determinando os tipos de cada parametro da função ger_puzzle
-        self.lib.get_puzzle.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int))
+        self.lib.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
 
         # Cria matriz 9x9 
         puzzle = (ctypes.c_int * (9 * 9))()
+        solution = (ctypes.c_int * (9 * 9))()
 
         # Chamando a função 
-        self.lib.get_puzzle(9, 9, puzzle)
+        self.lib.get_puzzle(puzzle, solution)
 
         # Convertendo para numpy
-        np_puzzle = np.ctypeslib.as_array(puzzle).reshape(9, 9)
-
-        print("matriz recebida de c:")
-        print(np_puzzle)
+        self.puzzle = np.ctypeslib.as_array(puzzle).reshape(9, 9)
+        self.solution = np.ctypeslib.as_array(solution).reshape(9, 9)
 
         for linha in range(9):
             for coluna in range(9):
-                value = str(np_puzzle[linha][coluna]) if np_puzzle[linha][coluna] != 0 else ''
+                value = str(self.puzzle[linha][coluna]) if self.puzzle[linha][coluna] != 0 else ''
+                self.celulas[linha][coluna].config(state='normal')
                 self.celulas[linha][coluna].delete(0, 'end')
                 self.celulas[linha][coluna].insert(0, value)
+                if (value != ''): self.celulas[linha][coluna].config(state='readonly')
 
     def limpar_jogo(self):
         for linha in range(9):
             for coluna in range(9):
                 self.celulas[linha][coluna].delete(0, 'end')
 
-
+    def resolver_jogo(self):
+        for linha in range(9):
+            for coluna in range(9):
+                value = str(self.solution[linha][coluna])
+                if value == str(self.puzzle[linha][coluna]):
+                    continue
+                else:
+                    self.celulas[linha][coluna].insert(0, value)
+                    self.celulas[linha][coluna].config(state='readonly')
