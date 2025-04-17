@@ -18,7 +18,8 @@ void get_puzzle(int *puzzle, int *solution) {
     char puzzle_aux[82] = {0};
     char solution_aux[82] = {0};
 
-    arq = fopen("c/sudoku.csv", "r");
+    arq = fopen("c/sudoku.csv", "r"); //rodando pelo docker
+    //arq = fopen("../c/sudoku.csv", "r"); //rodando localmente
     if (!arq) {
         printf("Erro ao abrir arquivo");
         exit(1);
@@ -75,24 +76,92 @@ void get_puzzle(int *puzzle, int *solution) {
 
 
 void *validar_linha(void *param) {
-    int row = *(int *)param;
-    int seen[N] = {0};
+    int row = *(int *)param; //seleção da linha do sudoku
+    int seen[N] = {0}; //Array que define quais numeros ja foram vistos
 
     for (int i = 0; i < N; i++) {
-        int val = sudoku[row][i];
+        int val = sudoku[row][i]; //seleciona o numero da linha 
 
         // Verifica se o número está fora do intervalo ou repetido
         if (val < 1 || val > 9 || seen[val - 1]) {
-            pthread_mutex_lock(&lock);
-            resultado = 0;
-            pthread_mutex_unlock(&lock);
-            pthread_exit(NULL);
+            pthread_mutex_lock(&lock); //abre o lock para alterar a variavel resultado
+            resultado = 0; //avisa que uma das linhas esta incorreta
+            pthread_mutex_unlock(&lock); //destrava o lock
+            pthread_exit(NULL); //encerra a operação
         }
 
-        seen[val - 1] = 1;
+        seen[val - 1] = 1; //marca o numero como ja visto
     }
 
-    pthread_exit(NULL);
+    pthread_exit(NULL); //encerra a operação
+}
+
+int verificar_puzzle(int *puzzle){
+    pthread_t threads[N]; //Definição de Threads
+    int indices[N];
+
+    // Copia o puzzle para a matriz global sudoku
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            sudoku[i][j] = puzzle[i * 9 + j];
+        }
+    }
+
+    pthread_mutex_init(&lock, NULL); //inicia o lock
+
+    // Cria as threads
+    for (int i = 0; i < N; i++) {
+        indices[i] = i;
+        pthread_create(&threads[i], NULL, validar_linha, &indices[i]);
+    }
+
+    // Aguarda todas as threads finalizarem
+    for (int i = 0; i < N; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    pthread_mutex_destroy(&lock); //encerra o lock
+
+    return resultado; //retorna 1 se foi validado, e 0 se não foi
+}
+
+
+int main(){
+    int puzzle[81], solution[81];
+    int retorno;
+
+    // Gera um novo puzzle e sua solução
+    //lembre de muda a linha de pegar o puzzle para:
+    //arq = fopen("../c/sudoku.csv", "r");
+    get_puzzle(puzzle, solution);
+
+    // Copia a solução ou o puzzle para a matriz global 'sudoku'
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            //sudoku[i][j] = puzzle[i * 9 + j];
+            sudoku[i][j] = solution[i * 9 + j];
+        }
+    }
+
+    printf("Sudoku:\n");
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%d ", sudoku[i][j]);
+            //printf("%d ", puzzle[i][j]);
+        }
+        printf("\n");
+    }
+
+    retorno = verificar_puzzle(puzzle); //checando o sudoku
+
+    if (retorno){
+        printf("Todas as linhas são válidas.\n");
+    }
+    else{
+        printf("Alguma linha é inválida.\n");
+    }
+        
+    return 0;
 }
 
 /*int main() {

@@ -1,4 +1,5 @@
 import tkinter as ttk
+from tkinter import messagebox
 import ctypes
 import numpy as np
 import os
@@ -90,7 +91,8 @@ class SudokuInterface:
         ttk.Button(control_frame, text="Novo jogo", background='#2196f3', width=30, command=self.criar_jogo).pack(pady=5) # Botão responsável por criar um novo jogo
         ttk.Button(control_frame, text="Resolver", background='#4caf50', width=30, command=self.resolver_jogo).pack(pady=5) # Botão responsável por resolver o puzzle
         ttk.Button(control_frame, text="Limpar", background='#f44336', width=30, command=self.limpar_jogo).pack(pady=5) # Botão responsável por limpar o puzzle
-        ttk.Button(control_frame, text="Verificar", background='#ffc107', width=30).pack(pady=5) # Botão responsável por validar o puzzle
+        #ttk.Button(control_frame, text="Verificar", background='#ffc107', width=30).pack(pady=5) # Botão responsável por validar o puzzle
+        ttk.Button(control_frame, text="Verificar", background='#ffc107', width=30, command=self.verificar_jogo).pack(pady=5) # Botão responsável por validar o puzzle
 
     def create_numbers_buttons(self):
 
@@ -115,7 +117,7 @@ class SudokuInterface:
 
     def criar_jogo(self):
 
-        # Determinando os tipos de cada parametro da função ger_puzzle
+        # Determinando os tipos de cada parametro da função get_puzzle
         self.lib.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
 
         # Cria matriz 9x9 
@@ -151,3 +153,35 @@ class SudokuInterface:
                 else:
                     self.celulas[linha][coluna].insert(0, value)
                     self.celulas[linha][coluna].config(state='readonly')
+    
+    def verificar_jogo(self):
+        #copiando o estado atual das celulas para a variavel puzzle
+        puzzle = []
+        for linha in range(9):
+            for coluna in range(9):
+                valor = self.celulas[linha][coluna].get() #pega a celula atual
+                try:
+                    num = int(valor)
+                except ValueError:
+                    num = 0  # Se estiver vazio ou for inválido
+                puzzle.append(num)
+
+        #Criando um vetor de inteiro de tamanho 81 para a função
+        puzzle_c = (ctypes.c_int * 81)(*puzzle)
+
+        #Configurando que a função usa um vetor e retorna um valor inteiro
+        self.lib.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
+        self.lib.verificar_puzzle.restype = ctypes.c_int
+
+        #chamando a função de verificação
+        checagem = self.lib.verificar_puzzle(puzzle_c)
+
+        if(checagem == 1): #O resultado está correto
+            for linha in range(9):
+                for coluna in range(9):
+                    self.celulas[linha][coluna].config(state='readonly') #travando o puzzle
+            messagebox.showinfo("Sucesso", "Parabéns! Você solucionou o puzzle.")
+        else: #O resultado não está correto
+            messagebox.showerror("Erro", "Existe um Erro na Solução Proposta ao Sudoku.")
+
+
