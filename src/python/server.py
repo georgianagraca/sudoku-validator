@@ -1,3 +1,5 @@
+# Implementa uma API Flask para validar o Sudoku por meio de requisições HTTP.
+
 from flask import Flask, request, jsonify
 import subprocess
 import os
@@ -10,30 +12,34 @@ def home():
 
 @app.route("/validar", methods=["POST"])
 def validar():
-    data = request.json
-    matriz = data.get("matriz")
+    try:
+        data = request.json
+        matriz = data.get("matriz")
 
-    # Validate the input matrix
-    if not matriz or len(matriz) != 9 or any(len(row) != 9 for row in matriz):
-        return jsonify({"erro": "Matriz inválida! A matriz deve ser 9x9."}), 400
+        # Validar a matriz de entrada
+        if not matriz or len(matriz) != 9 or any(len(row) != 9 for row in matriz):
+            return jsonify({"erro": "Matriz inválida! A matriz deve ser 9x9."}), 400
 
-    # Save the matrix to a file for the C program to read
-    sudoku_file_path = os.path.join(os.path.dirname(__file__), "../c/sudoku.txt")
-    with open(sudoku_file_path, "w") as f:
-        for row in matriz:
-            f.write(" ".join(str(num) for num in row) + "\n")
+        # Salva a matriz em um arquivo para o programa C processar
+        sudoku_file_path = os.path.join(os.path.dirname(__file__), "sudoku.txt")
+        with open(sudoku_file_path, "w") as f:
+            for row in matriz:
+                f.write(" ".join(str(num) for num in row) + "\n")
 
-    # Run the C binary to validate the Sudoku
-    binary_path = os.path.join(os.path.dirname(__file__), "../c/sudoku_validator")
-    result = subprocess.run([binary_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Executa o programa C
+        binary_path = os.path.join(os.path.dirname(__file__), "sudoku_validator")
+        result = subprocess.run([binary_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # Check the result of the C program
-    if result.returncode == 0:
-        return jsonify({"valido": True, "mensagem": "O Sudoku é válido!"})
-    else:
-        return jsonify({"valido": False, "mensagem": "O Sudoku é inválido!"})
+        # Verifica o resultado do programa C
+        if result.returncode == 0:
+            return jsonify({"valido": True, "mensagem": "O Sudoku é válido!"})
+        else:
+            return jsonify({"valido": False, "mensagem": "O Sudoku é inválido!"})
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
 
 if __name__ == "__main__":
-    # Ensure the server listens on port 8080 for Cloud Run
+    # Certifique-se de que o servidor escuta na porta 8080 no Cloud Run
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)

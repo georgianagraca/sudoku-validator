@@ -1,3 +1,6 @@
+# Contém a classe `SudokuInterface`, que define a interface gráfica do 
+# usuário e se integra ao backend C.
+
 import tkinter as ttk
 from tkinter import messagebox
 import ctypes
