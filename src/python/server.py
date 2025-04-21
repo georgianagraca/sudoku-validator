@@ -1,3 +1,5 @@
+# Implementa uma API Flask para validar o Sudoku por meio de requisições HTTP.
+
 from flask import Flask, request, jsonify
 import subprocess
 import os
