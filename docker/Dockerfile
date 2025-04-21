@@ -1,34 +1,35 @@
 FROM python:3.12
 
-# Define o diretório de trabalho
+# Define o diretório de trabalho no container
 WORKDIR /app
 
-# Instala o GCC, o Make e ox11 para a interface
-RUN apt-get update && apt-get install -y gcc make python3 python3-tk x11-apps
+# Copia o requirements.txt para o container
+COPY ../requirements.txt /app/
 
-# Copia os arquivos C
-COPY ../src/c/ /app/c
+# Instala dependências do sistema (GCC, Make, Python3-Tk, X11)
+RUN apt-get update && \
+    apt-get install -y gcc make python3-tk x11-apps && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Compila o .so usando make
+# Copia o código C para o container
+COPY ../src/c /app/c
+
+# Compila o código C
 WORKDIR /app/c
 RUN make
 
-# Copia os arquivos Python
+# Copia o código Python para o container
 WORKDIR /app
-COPY ../src/python/ /app/
+COPY ../src/python /app
 
-# Copia o requirements.txt 
-COPY ../requirements.txt /app/
+# Instala dependências do Python
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Instala as dependências necessárias
-RUN pip install -r requirements.txt
-
-# Configura a variável de ambiente
+# Define variáveis de ambiente
 ENV DOCKER_ENV=1
-
-# Configura a variável DISPLAY e o acesso ao servidor X a
 ENV DISPLAY=:0
 ENV XAUTHORITY=/root/.Xauthority
 
-# Inicia a aplicação
+# Comando para iniciar a aplicação
 CMD ["python", "app.py"]
