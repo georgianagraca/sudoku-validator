@@ -18,7 +18,7 @@ WORKDIR /app
 COPY ./src/python/*.py /app/
 
 # Copia o requirements.txt e instala dependências
-COPY requirements.txt .
+COPY ../requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Define variáveis de ambiente para Cloud Run

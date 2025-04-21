@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -Wall -pthread -fPIC
 SRC = sudoku_validator.c
-SO = sudoku_validator.so
+BIN = sudoku_validator  # Nome do binário executável
 
-all: $(SO)
+all: $(BIN)
 
-$(SO): $(SRC)
-	$(CC) $(CFLAGS) -shared -o $(SO) $(SRC)
+$(BIN): $(SRC)
+	$(CC) $(CFLAGS) -o $(BIN) $(SRC)  # Gera o binário executável
 
 clean:
-	rm -f $(SO)
+	rm -f $(BIN)
