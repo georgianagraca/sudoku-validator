@@ -1,35 +1,28 @@
 FROM python:3.12
 
-# Define o diretório de trabalho no container
+# Cria diretório de trabalho
 WORKDIR /app
 
-# Copia o requirements.txt para o container
-COPY ../requirements.txt /app/
+# Instala gcc e make para compilar o C
+RUN apt-get update && apt-get install -y gcc make
 
-# Instala dependências do sistema (GCC, Make, Python3-Tk, X11)
-RUN apt-get update && \
-    apt-get install -y gcc make python3-tk x11-apps && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copia o código C para o container
-COPY ../src/c /app/c
-
-# Compila o código C
+# Copia e compila os arquivos C
+COPY ./src/c /app/c
 WORKDIR /app/c
 RUN make
 
-# Copia o código Python para o container
+# Volta para o diretório da aplicação Python
 WORKDIR /app
-COPY ../src/python /app
 
-# Instala dependências do Python
+# Copia os arquivos Python individualmente (não a pasta)
+COPY ./src/python/*.py /app/
+
+# Copia o requirements.txt e instala dependências
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Define variáveis de ambiente
-ENV DOCKER_ENV=1
-ENV DISPLAY=:0
-ENV XAUTHORITY=/root/.Xauthority
+# Define variáveis de ambiente para Cloud Run
+ENV PORT=8080
 
-# Comando para iniciar a aplicação
-CMD ["python", "app.py"]
+# Define comando de inicialização
+CMD ["python", "server.py"]
