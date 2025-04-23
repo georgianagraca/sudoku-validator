@@ -25,4 +25,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV PORT=8080
 
 # Define comando de inicialização
-CMD python server.py && python app.py
+CMD ["python", "server.py"]
