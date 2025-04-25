@@ -151,9 +151,11 @@ class SudokuInterface:
         for linha in range(9):
             for coluna in range(9):
                 value = str(self.solution[linha][coluna])
-                if value == str(self.puzzle[linha][coluna]):
+                if value == str(self.celulas[linha][coluna]):
+                    self.celulas[linha][coluna].config(state='readonly')
                     continue
                 else:
+                    self.celulas[linha][coluna].delete(0, 'end')
                     self.celulas[linha][coluna].insert(0, value)
                     self.celulas[linha][coluna].config(state='readonly')
     

@@ -1,1 +1,0 @@
-/*Header com funções do validador*/
