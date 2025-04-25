@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  sudoku:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "9090:8080" 
+    volumes:
+      - ./src/python:/app 
+      - ./src/c:/app/c     
+    environment:
+      - PORT=8080
+      - FLASK_ENV=development
+    command: >
+      sh -c "cd /app/c && make && cd /app && python server.py"
