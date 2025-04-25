@@ -8,30 +8,10 @@ Autores: Beatriz Montenegro, Fellype Dias, Georgiana Graça
 
 ## Este repositório contém o código para o Projeto Final da Disciplina
 (Add Explicação do Projeto)  
-## Instruções de Uso
+## Instruções de Compilação
 
 ### Rodar a Aplicação Utilizando Docker
-
-#### 1. Construir a Imagem Docker
-
-Para construir a imagem Docker a partir do `Dockerfile` localizado na pasta `docker`, execute o seguinte comando:
-
-```bash
-docker build -t sudoku -f docker/Dockerfile .
-```
-
-#### 2. Permitir Acesso ao Servidor X 
-Antes de executar o container, no terminal rode o seguinte comando para liberar o acesso ao servidor X para o usuário `root`local:
-```bash
-xhost +local:root
-```
-
-#### 3. Rodar o Container Docker
-Após construir a imagem, rode o seguinte comando para iniciar o container e permitir que a interface gráfica seja exibida:
-
-```bash
-docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix sudoku
-```
+add
 
 ### Rodar a Aplicação Localmente
 
@@ -73,7 +53,5 @@ cd src/python
 python3 app.py
 ```
 
-
-(Add Instruções de Compilação)  
 (Add Instruções de Uso)  
 (Add quem fez o que)
