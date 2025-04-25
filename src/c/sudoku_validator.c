@@ -18,8 +18,8 @@ void get_puzzle(int *puzzle, int *solution) {
     char puzzle_aux[82] = {0};
     char solution_aux[82] = {0};
 
-    arq = fopen("c/sudoku.csv", "r"); //rodando pelo docker
-    //arq = fopen("../c/sudoku.csv", "r"); //rodando localmente
+    //arq = fopen("c/sudoku.csv", "r"); //rodando pelo docker
+    arq = fopen("../c/sudoku.csv", "r"); //rodando localmente
     if (!arq) {
         printf("Erro ao abrir arquivo");
         exit(1);
@@ -97,6 +97,7 @@ void *validar_linha(void *param) {
 }
 
 int verificar_puzzle(int *puzzle){
+    resultado = 1;
     pthread_t threads[N]; //Definição de Threads
     int indices[N];
 
