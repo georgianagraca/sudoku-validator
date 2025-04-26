@@ -75,7 +75,7 @@ void get_puzzle(int *puzzle, int *solution) {
 }
 
 
-void *validar_linha(void *param) {
+void *validar_linhas(void *param) {
     int row = *(int *)param; //seleção da linha do sudoku
     int seen[N] = {0}; //Array que define quais numeros ja foram vistos
 
@@ -96,10 +96,58 @@ void *validar_linha(void *param) {
     pthread_exit(NULL); //encerra a operação
 }
 
+void *validar_colunas(void *param) {
+    int col = *(int *)param; //seleção da coluna do sudoku
+    int seen[N] = {0}; //Array que define quais numeros ja foram vistos
+
+    for (int i = 0; i < N; i++) {
+        int val = sudoku[i][col]; //seleciona o numero da coluna 
+
+        // Verifica se o número está fora do intervalo ou repetido
+        if (val < 1 || val > 9 || seen[val - 1]) {
+            pthread_mutex_lock(&lock); //abre o lock para alterar a variavel resultado
+            resultado = 0; //avisa que uma das colunas esta incorreta
+            pthread_mutex_unlock(&lock); //destrava o lock
+            pthread_exit(NULL); //encerra a operação
+        }
+
+        seen[val - 1] = 1; //marca o numero como ja visto
+    }
+
+    pthread_exit(NULL); //encerra a operação
+}
+
+void *validar_quadros(void *param) {
+    int quadro = *(int *)param; //seleção da indice base do quadro
+    int seen[N] = {0}; //Array que define quais numeros ja foram vistos
+
+    int start_row = (quadro / 3) * 3; //calcula a linha inicial
+    int start_col = (quadro % 3) * 3; //calcula a coluna inicial
+
+    for (int i = 0; i < 3; i++) { 
+        for (int j = 0; j < 3; j++) {
+            //Define o elemento do quadro a ser checado
+            int val = sudoku[start_row + i][start_col + j];
+
+            // Verifica se o número está fora do intervalo ou repetido
+            if (val < 1 || val > 9 || seen[val - 1]) {
+                pthread_mutex_lock(&lock); //abre o lock para alterar a variavel resultado
+                resultado = 0; //avisa que uma das colunas esta incorreta
+                pthread_mutex_unlock(&lock); //destrava o lock
+                pthread_exit(NULL); //encerra a operação
+            }
+
+            seen[val - 1] = 1; //marca o numero como ja visto
+        }
+    }
+
+    pthread_exit(NULL); //encerra a operação
+}
+
 int verificar_puzzle(int *puzzle){
     resultado = 1;
-    pthread_t threads[N]; //Definição de Threads
-    int indices[N];
+    pthread_t threads[N]; //Definição de Threads das linhas
+    int indices[N]; //vetor para indices das linhas
 
     // Copia o puzzle para a matriz global sudoku
     for (int i = 0; i < N; i++) {
@@ -110,15 +158,43 @@ int verificar_puzzle(int *puzzle){
 
     pthread_mutex_init(&lock, NULL); //inicia o lock
 
-    // Cria as threads
+    // Cria as threads da verificação das linhas
     for (int i = 0; i < N; i++) {
         indices[i] = i;
-        pthread_create(&threads[i], NULL, validar_linha, &indices[i]);
+        pthread_create(&threads[i], NULL, validar_linhas, &indices[i]);
     }
 
     // Aguarda todas as threads finalizarem
     for (int i = 0; i < N; i++) {
         pthread_join(threads[i], NULL);
+    }
+
+    pthread_t threads_coluna[N]; //Declara as threads da colunas
+    int indices_coluna[N]; //armazena os indices das colunas
+
+    // Cria as threads da verificação das colunas
+    for (int i = 0; i < N; i++) {
+        indices_coluna[i] = i; 
+        pthread_create(&threads_coluna[i], NULL, validar_colunas, &indices_coluna[i]);
+    }
+
+    // Aguarda o termino das threads das colunas
+    for (int i = 0; i < N; i++) {
+        pthread_join(threads_coluna[i], NULL);
+    }
+
+    pthread_t threads_quadro[N]; //Declara as threads dos quadros 3 x 3
+    int indices_quadro[N]; //armazena os indices das quadros
+
+    // Cria as threads da verificação das colunas
+    for (int i = 0; i < N; i++) {
+        indices_quadro[i] = i; 
+        pthread_create(&threads_quadro[i], NULL, validar_quadros, &indices_quadro[i]);
+    }
+
+    // Aguarda o termino das threads das colunas
+    for (int i = 0; i < N; i++) {
+        pthread_join(threads_quadro[i], NULL);
     }
 
     pthread_mutex_destroy(&lock); //encerra o lock
@@ -164,38 +240,3 @@ int main(){
         
     return 0;
 }
-
-/*int main() {
-    FILE *file = fopen("sudoku.txt", "r");
-    if (!file) {
-        perror("Erro ao abrir o arquivo sudoku.txt");
-        return 1;
-    }
-
-    // Lê a matriz do arquivo
-    for (int i = 0; i < N; i++)
-        for (int j = 0; j < N; j++)
-            fscanf(file, "%d", &sudoku[i][j]);
-
-    fclose(file);
-
-    pthread_t threads[N];
-    int indices[N];
-
-    pthread_mutex_init(&lock, NULL);
-
-    // Cria as threads
-    for (int i = 0; i < N; i++) {
-        indices[i] = i;
-        pthread_create(&threads[i], NULL, validar_linha, &indices[i]);
-    }
-
-    // Aguarda todas as threads finalizarem
-    for (int i = 0; i < N; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    pthread_mutex_destroy(&lock);
-
-    return resultado ? 0 : 1;
-}*/
