@@ -182,9 +182,6 @@ class SudokuInterface:
         checagem = self.lib.verificar_puzzle(puzzle_c)
 
         if(checagem == 1): #O resultado está correto
-            for linha in range(9):
-                for coluna in range(9):
-                    self.celulas[linha][coluna].config(state='readonly') #travando o puzzle
             messagebox.showinfo("Sucesso", "Parabéns! Você solucionou o puzzle.")
         else: #O resultado não está correto
             messagebox.showerror("Erro", "Existe um Erro na Solução Proposta ao Sudoku.")
