@@ -155,12 +155,17 @@ void *validar_quadro(void *param) {
     pthread_exit(NULL); //encerra a operação
 }
 
-void verificar_linhas(){
+void verificar_linhas(FILE *arq){
+
     
     // Verificação da linha usando 9 threads
+    fprintf(arq, "\nfeaVerificando linhas usando 9 threads...\n");
     pthread_t threads_linhas[N]; // Definição de threads das linhas
     int indices[N]; //vetor para indices das linhas
+    clock_t tempo_criacao, tempo_execucao;
 
+    tempo_execucao = clock();
+    tempo_criacao = clock();
 
     // Cria as threads da verificação das linhas
     for (int i = 0; i < N; i++) {
@@ -168,18 +173,29 @@ void verificar_linhas(){
         pthread_create(&threads_linhas[i], NULL, validar_linhas, &indices[i]);
     }
 
+    tempo_criacao = clock() - tempo_criacao;
+
     // Aguarda todas as threads finalizarem
     for (int i = 0; i < N; i++) {
         pthread_join(threads_linhas[i], NULL);
     }
 
+    tempo_execucao = clock() - tempo_execucao;
+
+    fprintf(arq, "Tempo de criação das threads: %.3f ms\n", ((double)tempo_criacao)/((CLOCKS_PER_SEC/1000)));
+    fprintf(arq, "Tempo de execução das threads: %.3f ms\n", ((double)tempo_execucao)/((CLOCKS_PER_SEC/1000)));
 }
 
-void verificar_colunas(){
+void verificar_colunas(FILE *arq){
 
     //Verificação usando 9 threads
+    fprintf(arq, "\nVerificando colunas usando 9 threads...\n");
     pthread_t threads_coluna[N]; //Declara as threads da colunas
     int indices_coluna[N]; //armazena os indices das colunas
+    clock_t tempo_criacao, tempo_execucao;
+
+    tempo_execucao = clock();
+    tempo_criacao = clock();
 
     // Cria as threads da verificação das colunas
     for (int i = 0; i < N; i++) {
@@ -187,18 +203,30 @@ void verificar_colunas(){
         pthread_create(&threads_coluna[i], NULL, validar_colunas, &indices_coluna[i]);
     }
 
+    tempo_criacao = clock() - tempo_criacao;
+
     // Aguarda o termino das threads das colunas
     for (int i = 0; i < N; i++) {
         pthread_join(threads_coluna[i], NULL);
     }
 
+    tempo_execucao = clock() - tempo_execucao;
+
+    fprintf(arq, "Tempo de criação das threads: %.3f ms\n", ((double)tempo_criacao)/((CLOCKS_PER_SEC/1000)));
+    fprintf(arq, "Tempo de execução das threads: %.3f ms\n", ((double)tempo_execucao)/((CLOCKS_PER_SEC/1000)));
+
 }
 
-void verificar_quadros(){
+void verificar_quadros(FILE *arq){
 
     // Verificação usando 9 threads
+    fprintf(arq, "\nVerificando quadros usando 9 threads...\n");
     pthread_t threads_quadro[N]; //Declara as threads dos quadros 3 x 3
     int indices_quadro[N]; //armazena os indices das quadros
+    clock_t tempo_criacao, tempo_execucao;
+
+    tempo_execucao = clock();
+    tempo_criacao = clock();
 
     // Cria as threads da verificação das colunas
     for (int i = 0; i < N; i++) {
@@ -206,15 +234,23 @@ void verificar_quadros(){
         pthread_create(&threads_quadro[i], NULL, validar_quadro, &indices_quadro[i]);
     }
 
+    tempo_criacao = clock() - tempo_criacao;
+
     // Aguarda o termino das threads das colunas
     for (int i = 0; i < N; i++) {
         pthread_join(threads_quadro[i], NULL);
     }
 
+    tempo_execucao = clock() - tempo_execucao;
+
+    fprintf(arq, "Tempo de criação das threads: %.3f ms\n", ((double)tempo_criacao)/((CLOCKS_PER_SEC/1000)));
+    fprintf(arq, "Tempo de execução das threads: %.3f ms\n", ((double)tempo_execucao)/((CLOCKS_PER_SEC/1000)));
+
 }
 
 int verificar_puzzle(int *puzzle){
     resultado = 1;
+    FILE *arq;
 
     // Copia o puzzle para a matriz global sudoku
     for (int i = 0; i < N; i++) {
@@ -223,14 +259,23 @@ int verificar_puzzle(int *puzzle){
         }
     }
 
+    arq = fopen("resultados.txt", "w"); //cria arquivo para registrar o tempo de execução das verificações
+    if (arq== NULL) {
+        printf("Erro ao criar o arquivo!\n");
+        exit(1);
+    }
+
+    fprintf(arq, "Executando verificação....\n");
+
     pthread_mutex_init(&lock, NULL); //inicia o lock
 
-    verificar_linhas(); // Chama a função para verificar as linhas
+    verificar_linhas(arq); // Chama a função para verificar as linhas
     if (resultado == 0) return 0;
-    verificar_colunas(); // Chama a função para verificar as colunas
+    verificar_colunas(arq); // Chama a função para verificar as colunas
     if (resultado == 0) return 0;
-    verificar_quadros(); // Chama a função para verificar os quadros
+    verificar_quadros(arq); // Chama a função para verificar os quadros
     pthread_mutex_destroy(&lock); //encerra o lock
+    fclose(arq);
     return resultado;
 }
 
