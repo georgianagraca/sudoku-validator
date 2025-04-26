@@ -34,6 +34,7 @@ void get_puzzle(int *puzzle, int *solution) {
     int indice = rand() % 1000;
 
     // ler as linhas do arquivo, até encontrar a linha correspondente ao indice sorteado
+    /* //Modo Sequencial
     for (int i = 0; i <= indice; i++) {
         if (!fgets(linha, MAX_LINHA, arq)) {
             printf("Erro ao ler linha %d\n", i);
@@ -41,7 +42,25 @@ void get_puzzle(int *puzzle, int *solution) {
             return;
         }
     }
+    */
+    
+    //Outro Método, cálculo para acesso direto
+    int tamanho_linha = 81 + 1 + 81 + 1; // 81 números + ',' + 81 números + '\n' 
+    // = 164 bytes
 
+    // move o cursor usando a função fseek
+    if (fseek(arq, tamanho_linha * indice, SEEK_CUR) != 0) {
+        printf("Erro ao mover cursor no arquivo.\n");
+        fclose(arq);
+        return;
+    }
+
+    // lê a linha escolhida
+    if (!fgets(linha, MAX_LINHA, arq)) {
+        printf("Erro ao ler linha %d\n", indice);
+        fclose(arq);
+        return;
+    }
     // remove quebra de linha
     if (linha[strlen(linha) - 1] == '\n') linha[strlen(linha) - 1] = '\0';
 
@@ -69,9 +88,6 @@ void get_puzzle(int *puzzle, int *solution) {
             solution[i * 9 + j] = solution_aux[i * 9 + j] - '0';
         }
     }
-
-    //printf("puzzle_aux: %s\n", puzzle_aux);
-    //printf("solucao: %s\n", solution_aux);
 }
 
 void *validar_linhas(void *param) {
@@ -159,7 +175,7 @@ void verificar_linhas(FILE *arq){
 
     
     // Verificação da linha usando 9 threads
-    fprintf(arq, "\nfeaVerificando linhas usando 9 threads...\n");
+    fprintf(arq, "\nVerificando linhas usando 9 threads...\n");
     pthread_t threads_linhas[N]; // Definição de threads das linhas
     int indices[N]; //vetor para indices das linhas
     clock_t tempo_criacao, tempo_execucao;
@@ -270,9 +286,15 @@ int verificar_puzzle(int *puzzle){
     pthread_mutex_init(&lock, NULL); //inicia o lock
 
     verificar_linhas(arq); // Chama a função para verificar as linhas
-    if (resultado == 0) return 0;
+    if (resultado == 0){
+        fclose(arq); //se a verficação der 0, já fecha o arq e retorna 0
+        return 0;
+    }
     verificar_colunas(arq); // Chama a função para verificar as colunas
-    if (resultado == 0) return 0;
+    if (resultado == 0){
+        fclose(arq);
+        return 0;
+    }
     verificar_quadros(arq); // Chama a função para verificar os quadros
     pthread_mutex_destroy(&lock); //encerra o lock
     fclose(arq);
