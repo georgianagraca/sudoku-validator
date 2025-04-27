@@ -1,0 +1,13 @@
+Executando verificação....
+
+Verificando colunas usando 9 threads...
+Tempo de criação das threads: 11.444 ms
+Tempo de execução das threads: 12.226 ms
+
+Verificando linhas usando 9 threads...
+Tempo de criação das threads: 12.452 ms
+Tempo de execução das threads: 12.694 ms
+
+Verificando quadros usando 9 threads...
+Tempo de criação das threads: 12.559 ms
+Tempo de execução das threads: 12.725 ms
