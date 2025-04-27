@@ -1,4 +1,5 @@
-# Pipeline do GitHub Actions
+# Pipeline/Workflow do GitHub Actions
+# Faz build da imagem, envia pro Artifact Registry, e faz deploy no Cloud Run
 
 name: CI/CD for Sudoku Validator to Cloud Run
 

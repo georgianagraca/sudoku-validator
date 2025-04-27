@@ -6,11 +6,13 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - "9090:8080" 
+     - "9090:8080"
     volumes:
       - ./src/python:/app 
-      - ./src/c:/app/c     
+      - ./src/c:/app/c    
+      - ./src/assets:/app/assets
     environment:
+      - DOCKER_ENV=1
       - PORT=8080
       - FLASK_ENV=development
     command: >
