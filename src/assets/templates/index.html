@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Sudoku</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="game-title">Jogo Sudoku</div>
+        
+        <div class="main-frame">
+            <!-- Grid do Sudoku -->
+            <div class="grid-frame" id="sudoku-grid">
+                {% for row in range(9) %}
+                    {% for col in range(9) %}
+                    <input type="text" class="sudoku-cell" 
+                           maxlength="1" 
+                           data-row="{{ row }}" 
+                           data-col="{{ col }}"
+                           oninput="validateInput(this)"
+                           onclick="selectCell(this)">
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            
+            <!-- Botões de Controle -->
+            <div class="control-frame">
+                <button class="control-btn btn-new" onclick="newGame()">Novo jogo</button>
+                <button class="control-btn btn-solve" onclick="solveGame()">Resolver</button>
+                <button class="control-btn btn-clear" onclick="clearGame()">Limpar</button>
+                <button class="control-btn btn-validate" onclick="validateGame()">Verificar</button>
+            </div>
+        </div>
+        
+        <!-- Teclado Numérico -->
+        <div class="number-buttons-frame">
+            {% for num in range(1, 10) %}
+            <button class="number-btn" onclick="insertNumber({{ num }})">{{ num }}</button>
+            {% endfor %}
+            <button class="number-btn delete-btn" onclick="insertNumber('Apagar')">Apagar</button>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -37,7 +37,7 @@ jobs:
 
       - name: Build and Push Docker image to Google Container Registry
         run: |
-          docker build -t us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator -f docker/Dockerfile .
+          docker build -t us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator ./src
           docker push us-central1-docker.pkg.dev/hardy-tenure-456214-m1/sudoku-validator/sudoku-validator
 
 
