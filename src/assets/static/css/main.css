@@ -1,0 +1,144 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.main-container {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.game-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.main-frame {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.grid-frame {
+    display: grid;
+    grid-template-columns: repeat(9, 50px);
+    grid-template-rows: repeat(9, 50px);
+    gap: 0;
+    border: 2px solid #333;
+    background-color: #333;
+}
+
+.sudoku-cell {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 18px;
+    font-family: Arial, sans-serif;
+    border: 1px solid #999;
+    box-sizing: border-box;
+    background-color: white;
+    padding: 0;
+}
+
+/* Adiciona borda mais grossa a cada 3ª coluna */
+.sudoku-cell:nth-child(3n) {
+    border-right: 2px solid #333;
+}
+
+/* Borda horizontal grossa (usando posição na grid de 9x9) */
+.sudoku-cell:nth-child(n+19):nth-child(-n+27),
+.sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 2px solid #333;
+}
+
+
+.sudoku-row:nth-child(3n) .sudoku-cell {
+    border-bottom: 2px solid #333;
+}
+
+.control-frame {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+    gap: 5px;
+}
+
+.control-btn {
+    padding: 8px 15px;
+    width: 200px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.btn-new {
+    background-color: #2196f3;
+    color: white;
+}
+
+.btn-solve {
+    background-color: #4caf50;
+    color: white;
+}
+
+.btn-clear {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-validate {
+    background-color: #ffc107;
+    color: black;
+}
+
+.number-buttons-frame {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 2px;
+}
+
+.number-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    background-color: #E3F2FD;
+    color: #1565C0;
+    cursor: pointer;
+    margin: 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-btn {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+.sudoku-cell[readonly] {
+    background-color: #f0f0f0;
+    color: #333;
+    font-weight: bold;
+}
+
+.selected-cell {
+    background-color: #fff9c4;
+}
