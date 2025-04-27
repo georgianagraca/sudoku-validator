@@ -7,8 +7,13 @@ services:
     ports:
       - "9090:8080" 
     working_dir: /app/python
+    volumes:
+      - ./resultados:/app/resultados
     environment:
       - PORT=8080
       - FLASK_ENV=development
+      - FLASK_DEBUG=1 
     command: >
-      sh -c "cd /app/c && make && cd /app/python && python server.py"
+      sh -c "mkdir -p /app/resultados && 
+             cd /app/c && make && 
+             cd /app/python && python server.py"
