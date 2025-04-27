@@ -5,74 +5,10 @@
 
 #define N 9
 
-#define MAX_LINHA 165 
-#define MAX_SUDOKU 82
-
 int sudoku[N][N];
 int resultado = 1;
 pthread_mutex_t lock;
 
-void get_puzzle(int *puzzle, int *solution) {
-    FILE *arq;
-    char linha[MAX_LINHA] = {0}, *virg;
-    char puzzle_aux[82] = {0};
-    char solution_aux[82] = {0};
-
-    //arq = fopen("c/sudoku.csv", "r"); //rodando pelo docker
-    arq = fopen("../c/sudoku.csv", "r"); //rodando localmente
-    if (!arq) {
-        printf("Erro ao abrir arquivo");
-        exit(1);
-    }
-
-    // pula a primeira linha do arquivo (cabeçalho)
-    if (fgets(linha, MAX_LINHA, arq)) 
-        if (linha[strlen(linha) - 1] == '\n') linha[strlen(linha) - 1] = '\0';
-
-    // sorteia índice (representa a linha do arquivo que sera usado como base para gerar o jogo)
-    srand(time(NULL));
-    int indice = rand() % 1000;
-
-    // ler as linhas do arquivo, até encontrar a linha correspondente ao indice sorteado
-    for (int i = 0; i <= indice; i++) {
-        if (!fgets(linha, MAX_LINHA, arq)) {
-            printf("Erro ao ler linha %d\n", i);
-            fclose(arq);
-            return;
-        }
-    }
-
-    // remove quebra de linha
-    if (linha[strlen(linha) - 1] == '\n') linha[strlen(linha) - 1] = '\0';
-
-    //separa a linha com base na virgula
-    virg = strchr(linha, ',');
-    if (virg) {
-        *virg = '\0';
-        virg++;
-
-        // copia o puzzle
-        strncpy(puzzle_aux, linha, MAX_SUDOKU - 1);
-        puzzle_aux[MAX_SUDOKU - 1] = '\0';
-
-        //copia a solução
-        strncpy(solution_aux, virg, MAX_SUDOKU - 1);
-        solution_aux[MAX_SUDOKU - 1] = '\0';
-    } 
-
-    fclose(arq);
-
-    // converte para matriz 9x9 de inteiros
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 9; j++) {
-            puzzle[i * 9 + j] = puzzle_aux[i * 9 + j] - '0';
-            solution[i * 9 + j] = solution_aux[i * 9 + j] - '0';
-        }
-    }
-
-    //printf("puzzle_aux: %s\n", puzzle_aux);
-    //printf("solucao: %s\n", solution_aux);
-}
 
 void *validar_linhas(void *param) {
     int row = *(int *)param; //seleção da linha do sudoku
@@ -159,7 +95,7 @@ void verificar_linhas(FILE *arq){
 
     
     // Verificação da linha usando 9 threads
-    fprintf(arq, "\nfeaVerificando linhas usando 9 threads...\n");
+    fprintf(arq, "\nVerificando linhas usando 9 threads...\n");
     pthread_t threads_linhas[N]; // Definição de threads das linhas
     int indices[N]; //vetor para indices das linhas
     clock_t tempo_criacao, tempo_execucao;
@@ -184,6 +120,8 @@ void verificar_linhas(FILE *arq){
 
     fprintf(arq, "Tempo de criação das threads: %.3f ms\n", ((double)tempo_criacao)/((CLOCKS_PER_SEC/1000)));
     fprintf(arq, "Tempo de execução das threads: %.3f ms\n", ((double)tempo_execucao)/((CLOCKS_PER_SEC/1000)));
+
+    // Verificando usando uma única thread
 }
 
 void verificar_colunas(FILE *arq){
@@ -279,42 +217,3 @@ int verificar_puzzle(int *puzzle){
     return resultado;
 }
 
-
-
-int main(){
-    int puzzle[81], solution[81];
-    int retorno;
-
-    // Gera um novo puzzle e sua solução
-    //lembre de muda a linha de pegar o puzzle para:
-    //arq = fopen("../c/sudoku.csv", "r");
-    get_puzzle(puzzle, solution);
-
-    // Copia a solução ou o puzzle para a matriz global 'sudoku'
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            //sudoku[i][j] = puzzle[i * 9 + j];
-            sudoku[i][j] = solution[i * 9 + j];
-        }
-    }
-
-    printf("Sudoku:\n");
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            printf("%d ", sudoku[i][j]);
-            //printf("%d ", puzzle[i][j]);
-        }
-        printf("\n");
-    }
-
-    retorno = verificar_puzzle(puzzle); //checando o sudoku
-
-    if (retorno){
-        printf("Todas as linhas são válidas.\n");
-    }
-    else{
-        printf("Alguma linha é inválida.\n");
-    }
-        
-    return 0;
-}
