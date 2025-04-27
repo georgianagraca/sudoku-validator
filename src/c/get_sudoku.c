@@ -26,7 +26,27 @@ void get_puzzle(int *puzzle, int *solution) {
     srand(time(NULL));
     int indice = rand() % 1000;
 
+    //Outro Método, cálculo para acesso direto
+    int tamanho_linha = 81 + 1 + 81 + 1; // 81 números + ',' + 81 números + '\n' 
+    // = 164 bytes
+
+    // move o cursor usando a função fseek
+    if (fseek(arq, tamanho_linha * indice, SEEK_CUR) != 0) {
+        printf("Erro ao mover cursor no arquivo.\n");
+        fclose(arq);
+        return;
+    }
+
+    // lê a linha escolhida
+    if (!fgets(linha, MAX_LINHA, arq)) {
+        printf("Erro ao ler linha %d\n", indice);
+        fclose(arq);
+        return;
+    }
+
     // ler as linhas do arquivo, até encontrar a linha correspondente ao indice sorteado
+    //Metodo Sequencial
+    /*
     for (int i = 0; i <= indice; i++) {
         if (!fgets(linha, MAX_LINHA, arq)) {
             printf("Erro ao ler linha %d\n", i);
@@ -34,6 +54,7 @@ void get_puzzle(int *puzzle, int *solution) {
             return;
         }
     }
+    */
 
     // remove quebra de linha
     if (linha[strlen(linha) - 1] == '\n') linha[strlen(linha) - 1] = '\0';
