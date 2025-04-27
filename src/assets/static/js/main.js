@@ -33,7 +33,7 @@ function selectCell(cell) {
 }
 
 function insertNumber(num) {
-    if (selectedCell) {
+    if (selectedCell && !selectedCell.readOnly) {
         if (num === 'Apagar') {
             selectedCell.value = '';
         } else {
@@ -98,6 +98,16 @@ function clearGame() {
     });
 }
 
+function isComplete(){
+    const cells = document.querySelectorAll('.sudoku-cell');
+    for (let i=0; i < 81; i++){
+        const value = cells[i].value || '0';
+        if (parseInt(value) === 0)
+            return false;
+    }
+    return true;
+}
+
 // Validar jogo
 async function validateGame() {
     const cells = document.querySelectorAll('.sudoku-cell');
@@ -125,15 +135,17 @@ async function validateGame() {
         }
         
         if (data.valid) {
-            alert(data.message || 'Parabéns! Você solucionou o puzzle.');
-            cells.forEach(cell => cell.readOnly = true);
+            if (isComplete()){
+                alert('Parabéns! Você solucionou o puzzle com sucesso!');
+                cells.forEach(cell => cell.readOnly = true);
+            } else{
+                alert('Tudo certo até agora! Continue assim!');
+            }
         } else {
-            alert(data.message || 'Existe um erro na solução proposta.');
+            alert('Existe um erro na solução proposta.');
         }
     } catch (error) {
         alert('Erro de conexão: ' + error.message);
     }
 }
 
-// Inicializa um jogo ao carregar a página
-window.onload = newGame;

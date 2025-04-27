@@ -37,7 +37,7 @@
         <!-- Teclado Numérico -->
         <div class="number-buttons-frame">
             {% for num in range(1, 10) %}
-            <button class="number-btn" onclick="insertNumber({{ num }})">{{ num }}</button>
+            <button class="number-btn" onclick="insertNumber('{{ num }}')">{{ num }}</button>
             {% endfor %}
             <button class="number-btn delete-btn" onclick="insertNumber('Apagar')">Apagar</button>
         </div>
