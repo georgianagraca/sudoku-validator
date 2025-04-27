@@ -12,8 +12,7 @@ void get_puzzle(int *puzzle, int *solution) {
     char puzzle_aux[82] = {0};
     char solution_aux[82] = {0};
 
-    //arq = fopen("c/sudoku.csv", "r"); //rodando pelo docker
-    arq = fopen("../c/sudoku.csv", "r"); //rodando localmente
+    arq = fopen("../c/sudoku.csv", "r"); 
     if (!arq) {
         printf("Erro ao abrir arquivo");
         exit(1);

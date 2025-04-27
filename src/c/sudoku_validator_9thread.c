@@ -197,7 +197,7 @@ int verificar_puzzle(int *puzzle){
         }
     }
 
-    arq = fopen("resultados.txt", "w"); //cria arquivo para registrar o tempo de execução das verificações
+    arq = fopen("/app/resultados/resultados.txt", "w"); //cria arquivo para registrar o tempo de execução das verificações
     if (arq== NULL) {
         printf("Erro ao criar o arquivo!\n");
         exit(1);
@@ -208,9 +208,15 @@ int verificar_puzzle(int *puzzle){
     pthread_mutex_init(&lock, NULL); //inicia o lock
 
     verificar_linhas(arq); // Chama a função para verificar as linhas
-    if (resultado == 0) return 0;
+    if (resultado == 0){
+        fclose (arq);
+        return 0;
+    }
     verificar_colunas(arq); // Chama a função para verificar as colunas
-    if (resultado == 0) return 0;
+    if (resultado == 0){
+        fclose (arq);
+        return 0;
+    }
     verificar_quadros(arq); // Chama a função para verificar os quadros
     pthread_mutex_destroy(&lock); //encerra o lock
     fclose(arq);

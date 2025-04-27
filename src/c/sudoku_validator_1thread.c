@@ -141,7 +141,7 @@ int verificar_puzzle(int *puzzle){
         }
     }
 
-    arq = fopen("resultados2.txt", "w"); //cria arquivo para registrar o tempo de execução das verificações
+    arq = fopen("/app/resultados/resultados2.txt", "w"); //cria arquivo para registrar o tempo de execução das verificações
     if (arq== NULL) {
         printf("Erro ao criar o arquivo!\n");
         exit(1);
