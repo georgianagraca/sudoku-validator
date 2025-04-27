@@ -21,10 +21,14 @@ class SudokuInterface:
         # Carregando a biblioteca sudoku em C
         if "DOCKER_ENV" in os.environ:
             # Caso esteja no docker
-            self.lib = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "c", "sudoku_validator.so"))
+            self.lib_get_sudoku = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "c", "get_sudoku.so"))
+            self.lib_validator9 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "c", "sudoku_validator_9thread.so"))
+            self.lib_validator1 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "c", "sudoku_validator_1thread.so"))
         else:
             # Caso esteja executando diretamente no ambiente local
-            self.lib = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator.so"))
+            self.lib_get_sudoku = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "get_sudoku.so"))
+            self.lib_validator9 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_9thread.so"))
+            self.lib_validator1 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_1thread.so"))
 
     # Valida a entrada digitada em cada célula para aceitar apenas um único número
     def number_validator(self, entry):
@@ -121,14 +125,14 @@ class SudokuInterface:
     def criar_jogo(self):
 
         # Determinando os tipos de cada parametro da função get_puzzle
-        self.lib.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+        self.lib_get_sudoku.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
 
         # Cria matriz 9x9 
         puzzle = (ctypes.c_int * (9 * 9))()
         solution = (ctypes.c_int * (9 * 9))()
 
         # Chamando a função 
-        self.lib.get_puzzle(puzzle, solution)
+        self.lib_get_sudoku.get_puzzle(puzzle, solution)
 
         # Convertendo para numpy
         self.puzzle = np.ctypeslib.as_array(puzzle).reshape(9, 9)
@@ -174,17 +178,20 @@ class SudokuInterface:
         #Criando um vetor de inteiro de tamanho 81 para a função
         puzzle_c = (ctypes.c_int * 81)(*puzzle)
 
-        #Configurando que a função usa um vetor e retorna um valor inteiro
-        self.lib.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
-        self.lib.verificar_puzzle.restype = ctypes.c_int
+        #Configurando que a função usa um vetor e retorna um valor inteiro (Validador usando 9 threads)
+        self.lib_validator9.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
+        self.lib_validator9.verificar_puzzle.restype = ctypes.c_int
+
+        #Configurando que a função usa um vetor e retorna um valor inteiro (Validador usando 1 thread)
+        self.lib_validator1.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
+        self.lib_validator1.verificar_puzzle.restype = ctypes.c_int
 
         #chamando a função de verificação
-        checagem = self.lib.verificar_puzzle(puzzle_c)
+        validate_9threads = self.lib_validator9.verificar_puzzle(puzzle_c)
+        validate_1thread = self.lib_validator1.verificar_puzzle(puzzle_c)
 
-        if(checagem == 1): #O resultado está correto
-            for linha in range(9):
-                for coluna in range(9):
-                    self.celulas[linha][coluna].config(state='readonly') #travando o puzzle
+
+        if(validate_9threads == 1 and validate_1thread == 1): #O resultado está correto
             messagebox.showinfo("Sucesso", "Parabéns! Você solucionou o puzzle.")
         else: #O resultado não está correto
             messagebox.showerror("Erro", "Existe um Erro na Solução Proposta ao Sudoku.")

@@ -1,12 +1,17 @@
 CC = gcc
 CFLAGS = -Wall -pthread -fPIC
-SRC = sudoku_validator.c
-BIN = sudoku_validator  # Nome do binário executável
+TARGETS = get_sudoku.so sudoku_validator_1thread.so sudoku_validator_9thread.so
 
-all: $(BIN)
+all: $(TARGETS)
 
-$(BIN): $(SRC)
-	$(CC) $(CFLAGS) -o $(BIN) $(SRC)  # Gera o binário executável
+get_sudoku.so: get_sudoku.c
+	$(CC) $(CFLAGS) -shared -o get_sudoku.so get_sudoku.c
+
+sudoku_validator_1thread.so: sudoku_validator_1thread.c
+	$(CC) $(CFLAGS) -shared -o sudoku_validator_1thread.so sudoku_validator_1thread.c
+
+sudoku_validator_9thread.so: sudoku_validator_9thread.c
+	$(CC) $(CFLAGS) -shared -o sudoku_validator_9thread.so sudoku_validator_9thread.c
 
 clean:
-	rm -f $(BIN)
+	rm -f $(TARGETS)

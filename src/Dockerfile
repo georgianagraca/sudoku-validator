@@ -3,28 +3,28 @@ FROM python:3.12
 # Cria diretório de trabalho
 WORKDIR /app
 
-# Instala gcc, o make e o tkinter
-RUN apt-get update && apt-get install -y gcc make python3 python3-tk
+# Instala gcc e o make
+RUN apt-get update && apt-get install -y gcc make
 
-# Copia os arquivos C
-COPY ../src/c /app/c
+# Copia o conteúdo de src para dentro de /app
+COPY assets /app/assets
+COPY c /app/c
+COPY python /app/python
+COPY requirements.txt /app/
 
 # Compila o .so usando make
 WORKDIR /app/c
 RUN make
 
-# Copia os arquivos Python
-WORKDIR /app
-COPY ../src/python/ /app/
-
-# Copia o requirements.txt 
-COPY ../requirements.txt /app/
+# Volta para a pasta correta do Python
+WORKDIR /app/python
 
 # Instala as dependências necessárias
-RUN pip install -r requirements.txt
+RUN pip install -r /app/requirements.txt
 
 # Define variáveis de ambiente para Cloud Run
 ENV PORT=8080
+ENV FLASK_ENV=development
 
 # Configura a variável DISPLAY e o acesso ao servidor X 
 ENV DISPLAY=:0

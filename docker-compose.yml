@@ -3,15 +3,17 @@ version: "3.8"
 services:
   sudoku:
     build:
-      context: .
-      dockerfile: docker/Dockerfile
+      context: ./src
     ports:
       - "9090:8080" 
+    working_dir: /app/python
     volumes:
-      - ./src/python:/app 
-      - ./src/c:/app/c     
+      - ./resultados:/app/resultados
     environment:
       - PORT=8080
       - FLASK_ENV=development
+      - FLASK_DEBUG=1 
     command: >
-      sh -c "cd /app/c && make && cd /app && python server.py"
+      sh -c "mkdir -p /app/resultados && 
+             cd /app/c && make && 
+             cd /app/python && python server.py"
