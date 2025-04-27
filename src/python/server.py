@@ -2,11 +2,9 @@
 
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
-import subprocess
 import os
 import ctypes
 import numpy as np
-import sys
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,55 +18,24 @@ class SudokuBackend:
     def __init__(self):
         self.puzzle = None
         self.solution = None
-        self.lib_get_puzzle = self._load_get_puzzle_library()
-        self.lib_validate = self._load_validator_library()
-
-    def _load_get_puzzle_library(self):
-        """Carrega a biblioteca de geração de Sudoku"""
-        try:
-            lib_path = os.path.join(os.path.dirname(__file__), "..", "c", "get_sudoku.so")
-            if not os.path.exists(lib_path):
-                raise FileNotFoundError(f"Biblioteca get_sudoku.so não encontrada: {lib_path}")
-            
-            lib = ctypes.CDLL(lib_path, mode=ctypes.RTLD_GLOBAL)
-            # Configura os tipos corretos da função get_puzzle
-            lib.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
-            lib.get_puzzle.restype = None
-            return lib
-        except Exception as e:
-            print(f"Erro ao carregar biblioteca get_sudoku.so: {e}", file=sys.stderr)
-            return None
-
-    def _load_validator_library(self):
-        """Carrega a biblioteca de validação de Sudoku"""
-        try:
-            # Trocar o nome do arquivo aqui conforme quiser usar 1 thread ou 9 threads
-            lib_path = os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_1thread.so")
-            # lib_path = os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_9thread.so")
-            
-            if not os.path.exists(lib_path):
-                raise FileNotFoundError(f"Biblioteca de validação não encontrada: {lib_path}")
-            
-            lib = ctypes.CDLL(lib_path, mode=ctypes.RTLD_GLOBAL)
-            lib.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
-            lib.verificar_puzzle.restype = ctypes.c_int
-            return lib
-        except Exception as e:
-            print(f"Erro ao carregar biblioteca de validação: {e}", file=sys.stderr)
-            return None
+        self.lib_validator9 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_9thread.so"))
+        self.lib_validator1 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_1thread.so"))
+        self.lib_get_sudoku = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "get_sudoku.so"))
 
     def new_game(self):
         """Gera um novo Sudoku"""
-        if not self.lib_get_puzzle:
-            return None, None, "Biblioteca get_sudoku.so não carregada"
 
         try:
+            self.lib_get_sudoku.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+
             puzzle = (ctypes.c_int * 81)()
             solution = (ctypes.c_int * 81)()
-            self.lib_get_puzzle.get_puzzle(puzzle, solution)
+
+            self.lib_get_sudoku.get_puzzle(puzzle, solution)
 
             self.puzzle = np.ctypeslib.as_array(puzzle).reshape(9, 9)
             self.solution = np.ctypeslib.as_array(solution).reshape(9, 9)
+
 
             return self.puzzle.tolist(), self.solution.tolist(), None
         except Exception as e:
@@ -82,16 +49,21 @@ class SudokuBackend:
 
     def validate_game(self, grid):
         """Valida o grid atual"""
-        if not self.lib_validate:
-            return False, "Biblioteca de validação não carregada"
 
         try:
-            if len(grid) != 81:
-                return False, "Grid deve conter exatamente 81 valores"
-            
             grid_c = (ctypes.c_int * 81)(*grid)
-            is_valid = self.lib_validate.verificar_puzzle(grid_c)
-            return bool(is_valid), None
+
+            self.lib_validator9.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
+            self.lib_validator9.verificar_puzzle.restype = ctypes.c_int
+
+            #Configurando que a função usa um vetor e retorna um valor inteiro (Validador usando 1 thread)
+            self.lib_validator1.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
+            self.lib_validator1.verificar_puzzle.restype = ctypes.c_int
+
+            #chamando a função de verificação
+            is_valid1 = self.lib_validator1.verificar_puzzle(grid_c)
+            is_valid9 = self.lib_validator9.verificar_puzzle(grid_c)
+            return bool(is_valid1 and is_valid9), None
         except Exception as e:
             return False, str(e)
 
@@ -113,9 +85,6 @@ def validate():
         data = request.json
         grid = data.get("grid")
 
-        if not grid or len(grid) != 81:
-            return jsonify({"error": "Grid inválido! Deve conter exatamente 81 números."}), 400
-
         valid, error = sudoku_backend.validate_game(grid)
         if error:
             return jsonify({"error": error}), 500
@@ -132,7 +101,7 @@ def new_game():
     puzzle, solution, error = sudoku_backend.new_game()
     if error:
         return jsonify({"error": error}), 500
-    return jsonify({"puzzle": puzzle})
+    return jsonify({"puzzle": puzzle, "solution": solution})
 
 @app.route("/solve", methods=["GET"])
 def solve():
