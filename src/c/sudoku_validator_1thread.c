@@ -4,8 +4,8 @@
 #include <string.h>
 
 #define N 9
-int sudoku[N][N];
-int resultado = 1;
+int sudoku[N][N]; //matriz representando o jogo sudoku
+int resultado = 1; //variavel que representa se há erro (0) ou não (1) no sudoku
 pthread_mutex_t lock;
 clock_t tempo_execucao_linha = 0, tempo_execucao_coluna = 0, tempo_execucao_quadro = 0; //calcula o tempo de execução total para as threads de linha, coluna e quadros
 
@@ -42,6 +42,8 @@ void *validar_linhas(void *param) {
                 pthread_mutex_unlock(&lock); //destrava o lock
                 pthread_exit(NULL); //encerra a operação
             }
+
+            seen[val - 1] = 1; //marca o numero como ja visto
         }
     }
     tempo = clock() - tempo;
@@ -83,6 +85,8 @@ void* validar_colunas(void *param) {
                 pthread_mutex_unlock(&lock);
                 pthread_exit(NULL); //encerra a operação
             }
+
+            seen[val - 1] = 1; //marca o numero como ja visto
         }
     }
 
@@ -120,13 +124,13 @@ void *validar_quadros(void *param) {
                 // Verifica se o número está fora do intervalo ou repetido
                 if (val < 1 || val > 9 || seen[val - 1]) {
                     pthread_mutex_lock(&lock); //abre o lock para alterar a variavel resultado
-                    resultado = 0; //avisa que uma das colunas esta incorreta
+                    resultado = 0; //avisa que um dos quadros esta incorreto
                     tempo = clock() - tempo;
                     tempo_execucao_quadro = tempo; //define o tempo de execução da thread de quadros
                     pthread_mutex_unlock(&lock);
                     pthread_exit(NULL); //encerra a operação
                 }
-            seen[val - 1] = 1; //marca o numero como ja visto
+                seen[val - 1] = 1; //marca o numero como ja visto
             }
         }
     }
@@ -137,7 +141,7 @@ void *validar_quadros(void *param) {
 
 
 int verificar_puzzle(int *puzzle){
-    resultado = 1;
+    resultado = 1; //seta resultado para 1
     pthread_t threads[3];
     clock_t tempo_criacao, tempo_execucao;
     FILE *arq;
@@ -163,9 +167,9 @@ int verificar_puzzle(int *puzzle){
 
     tempo_criacao = clock();
 
-    pthread_create(&threads[0], NULL, validar_linhas, NULL);
-    pthread_create(&threads[1], NULL, validar_colunas, NULL);
-    pthread_create(&threads[2], NULL, validar_quadros, NULL);
+    pthread_create(&threads[0], NULL, validar_linhas, NULL); // Thread responsável por validar todas as linhas
+    pthread_create(&threads[1], NULL, validar_colunas, NULL); // Thread responsável por validar todas as colunas
+    pthread_create(&threads[2], NULL, validar_quadros, NULL); // Thread responsável por validar todos os quadros
 
     tempo_criacao = clock() - tempo_criacao;
 
