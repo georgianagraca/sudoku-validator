@@ -1,4 +1,4 @@
-# Implementa uma API Flask para validar o Sudoku por meio de requisições HTTP.
+# Implementa uma API Flask para validar o Sudoku por meio de requisições HTTP
 
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
@@ -12,12 +12,14 @@ app = Flask(__name__,
             static_folder=os.path.join(BASE_DIR, "..", "assets", "static"),
             template_folder=os.path.join(BASE_DIR, "..", "assets", "templates"))
 
-CORS(app)
+CORS(app) #  Permite requisições de outros domínios
 
+# Geração, solução e validação dos puzzles
 class SudokuBackend:
     def __init__(self):
         self.puzzle = None
         self.solution = None
+        # Carrega as bibliotecas C quem validam e geram dos Sudokus
         self.lib_validator9 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_9thread.so"))
         self.lib_validator1 = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "sudoku_validator_1thread.so"))
         self.lib_get_sudoku = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "..", "c", "get_sudoku.so"))
@@ -26,11 +28,14 @@ class SudokuBackend:
         """Gera um novo Sudoku"""
 
         try:
+            # Define os tipos dos argumentos que a função get_puzzle espera
             self.lib_get_sudoku.get_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
 
+            # Cria arrays C para armazenar o puzzle e a solução
             puzzle = (ctypes.c_int * 81)()
             solution = (ctypes.c_int * 81)()
 
+            # Chama a função C que gera o puzzle e a solução
             self.lib_get_sudoku.get_puzzle(puzzle, solution)
 
             self.puzzle = np.ctypeslib.as_array(puzzle).reshape(9, 9)
@@ -53,6 +58,7 @@ class SudokuBackend:
         try:
             grid_c = (ctypes.c_int * 81)(*grid)
 
+            # Validador usando 9 threads
             self.lib_validator9.verificar_puzzle.argtypes = (ctypes.POINTER(ctypes.c_int),)
             self.lib_validator9.verificar_puzzle.restype = ctypes.c_int
 
@@ -79,6 +85,7 @@ def send_static(path):
 def home():
     return render_template("index.html")
 
+# Rota para validar um Sudoku recebido via POST
 @app.route("/validate", methods=["POST"])
 def validate():
     try:
@@ -96,6 +103,7 @@ def validate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Rota para gerar um novo Sudoku e enviar o puzzle e sua solução
 @app.route("/new-game", methods=["GET"])
 def new_game():
     puzzle, solution, error = sudoku_backend.new_game()
@@ -103,6 +111,7 @@ def new_game():
         return jsonify({"error": error}), 500
     return jsonify({"puzzle": puzzle, "solution": solution})
 
+# Rota para enviar a solução do Sudoku atual carregado
 @app.route("/solve", methods=["GET"])
 def solve():
     solution, error = sudoku_backend.solve_game()
