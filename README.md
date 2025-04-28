@@ -53,15 +53,20 @@ Depois, execute no terminal:
 ```bash
 pip install -r requirements.txt
 ```
-#### 2. Executar o Arquivo Python:
-Já estando no diretório `src`, acesse a pasta `python`, que é onde está localizado o arquivo `server.py`
-```bash
-cd python
-```
-Depois disso, basta executar o arquivo python usando (comando de execução em Linux):
-```bash
-python3 server.py
-```
+#### 2. Compilar a Biblioteca .so
+ Primeiro, acesse o diretório `src/c`, que é onde está localizado o arquivo C `sudoku_validator.c` e, logo depos, compile os arquivos C para gerar as bibliotecas compartilhadas `.so`
+ 
+ ```bash
+cd src/c
+make
+ ```
+
+#### 3. Executar o Arquivo Python:
+ Em seguida, acesse o diretório `src/python` e execute o seguinte comando para rodar a aplicação Python:
+ ```bash
+ cd src/python
+ python3 server.py
+ ``````
 Para acessar a aplicação, é semelhante a execução usando docker, acessando localhost:8080 ou localhost:9090, tendo o cuidado de estarem livres. Entretanto, ao contrário do uso do docker, os relatórios dos tempos de execução com diferentes usos de threads serão gerados no mesmo diretório do arquivo `server.py`.  
 
 ## Instruções de Uso
