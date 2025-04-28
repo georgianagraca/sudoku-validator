@@ -90,11 +90,11 @@ Por fim, se quiser verificar seu resultado, basta clicar em **Verificar** que um
 ![verificar_erro](https://github.com/user-attachments/assets/2476f190-3121-4db5-b155-2d8f8333bbb3)
 
 - Verificação mostrando menssagem de que o jogo em andamento se encontra até o momento correto:
-- 
+
 ![verificar_emAndamento](https://github.com/user-attachments/assets/78c05093-ed85-4b75-ace4-69fadbe0c335)
 
 - Verificação mostrando mensagem de que o jogo foi resolvido com sucesso:
-- 
+
 ![verificar_completo](https://github.com/user-attachments/assets/9eed78b9-385d-4a0a-ab1f-8977ab9b6162)
 
 
