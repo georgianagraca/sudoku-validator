@@ -68,20 +68,34 @@ Para acessar a aplicação, é semelhante a execução usando docker, acessando 
 ### Criação de um Jogo
 Após seguir os passos de execução do projeto e acesso a aplicação web, a tela inicial trará uma interface com um sudoku em branco, como mostrado na imagem abaixo: 
 
-Add imagem
+![tela_inicial](https://github.com/user-attachments/assets/4e84b926-f44e-44c3-9258-3659ef820bf8)
 
-Para criar uma partida, basta clicar no botão **Novo Jogo**. Essa ação gerará uma partida automaticamente e de forma aleatória, apenas deve-se tomar cuidado para não criar outro jogo por acidente ao tocar novamente no botão.  
+Para criar uma partida, basta clicar no botão **Novo Jogo**. Essa ação gerará uma partida automaticamente e de forma aleatória, apenas deve-se tomar cuidado para não criar outro jogo por acidente ao tocar novamente no botão. 
+
+![tela_inicial](https://github.com/user-attachments/assets/81a7cf35-0a27-4da0-9d24-de24320395f8)
+
 ### Como jogar
 Com o novo jogo em mãos, clique nos quadrados vazios, que são possíveis editar para tentar solucionar o jogo seguindo as regras do Sudoku, completando todo o quadro 9x9 sem repetir números nas linhas, nas colunas e em cada quadro 3x3 menor. Todo quadrado editável pode ser mudado livremente durante o jogo e o botão **Limpar** apaga tudo aquilo que você escreveu, caso queira começar do zero. 
 
 ### Resolução e Verificação
 Por fim, se quiser verificar seu resultado, basta clicar em **Verificar** que uma mensagem será enviada, informando se o jogo está parcialmente correto, e você deixou ainda campos em brancos, se ele tem algum erro que fere as regras do Sudoku ou se está correto e você solucionou o puzzle, como mostrado nas imagens abaixo: 
 
-add imagens 
+- Verificação mostrando menssagem de erro durante a resolução do puzzle:
+
+![verificar_erro](https://github.com/user-attachments/assets/2476f190-3121-4db5-b155-2d8f8333bbb3)
+
+- Verificação mostrando menssagem de que o jogo em andamento se encontra até o momento correto:
+- 
+![verificar_emAndamento](https://github.com/user-attachments/assets/78c05093-ed85-4b75-ace4-69fadbe0c335)
+
+- Verificação mostrando mensagem de que o jogo foi resolvido com sucesso:
+- 
+![verificar_completo](https://github.com/user-attachments/assets/9eed78b9-385d-4a0a-ab1f-8977ab9b6162)
+
 
 Além disso, o botão **Resolver** lhe dará o resultado correto daquele puzzle presente, mas também irá sobrescrever qualquer campo que foi editado. Quando acabar, basta apertar em **Novo Jogo** e começar de novo! 
 
-add imagem
+![resolver](https://github.com/user-attachments/assets/eeef111f-8f54-43a6-b855-8f04b5d0a7cb)
 
 ## Divisões do Projeto (Quem realizou cada parte)
 ### Beatriz Montenegro
