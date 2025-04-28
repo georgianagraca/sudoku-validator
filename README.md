@@ -6,19 +6,29 @@ Professor: Davi Henrique dos Santos
 Universidade Federal da Paraíba  
 Autores: Beatriz Montenegro, Fellype Dias, Georgiana Graça
 
-## Este repositório contém o código para o Projeto Final da Disciplina
 ## Sobre o Projeto
-Este trabalho apresenta uma interface capaz de criar, resolver e validar uma partida de sudoku.  
-Para isso, a aplicação será rodada em um servidor web que está responsável pela interface e interação com o jogo.  
-Entretanto, o real objetivo do projeto é analisar as diferentes formas de validação do puzzle sudoku.  
-Essa verificação é iniciada com um arquivo python chamando os arquivos em C que realmente implementam a validação do puzzle. Além disso, mais de uma abordagem é utilizada, usando mais ou menos Threads para executar os testes com cada linha, coluna e quadro do jogo. Dessa maneira, os resultados obtidos gerados sempre que o usuário clica em "Verificar" na aplicação, são na verdade, parte essencial do estudo desse trabalho e como eles se relacionam com os conceitos da área de Sistemas Operacionais.  
+Este trabalho tem como objetivo desenvolver um validador para o jogo Sudoku, explorando diferentes abordagens de concorrência utilizando Threads. O sistema foi implementado para rodar em um servidor, permitindo a análise de desempenho sob as seguintes estratégias:
 
-## Imagens da Interface
-### Imagem da Tela Inicial do Sudoku
-### Imagem da Tela com Jogo Novo Criado (Em branco)
-### Imagem da Tela com o Jogo com algum Erro
-### Imagem da Tela com o Jogo Parcialmente Correto
-### Imagem da Tela com o Jogo Completamente Correto
+#### 1. Validação com Três Threads:
+
+- Uma thread para verificar as linhas
+- Uma thread para verificar as colunas
+- Uma thread para verificar os quadros (grid 3x3)
+
+#### 2. Validação com Nove Threads:
+
+- Nove threads, em que cada uma é responsável por validar uma linha
+- Nove threads, em que cada uma é responsável por validar uma coluna
+- Nove threads, em que cada uma é responsável por validar umm quadro (grid 3x3)
+
+De forma complementar, também foi desenvolvida uma aplicação web interativa, hospedada em um servidor, que permite ao usuário:
+
+- Criar novas partidas
+- Resolver tabuleiros automaticamente
+- Limpar o jogo
+- Verificar a validade de uma solução
+
+A implementação combina código em C, para a validação e criação do jogo, com uma interface simples em Python. Os resultados gerados ao clicar em "Verificar" não apenas validam do partida, mas também servem como base para analisar o desempenho das diferentes abordagens utilizando Threads, relacionando-as diretamente com os conceitos estudados na disciplina de Sistemas Operacionais.
 
 ## Instruções de Compilação
 
@@ -56,15 +66,26 @@ Para acessar a aplicação, é semelhante a execução usando docker, acessando 
 
 ## Instruções de Uso
 ### Criação de um Jogo
-Após seguir os passos de execução do projeto e acesso a aplicação web, a tela inicial trará uma interface com um sudoku em branco, então basta clicar em **Novo Jogo** para iniciar uma partida. Essa ação gerará uma partida automaticamente e de forma aleatória, apenas deve-se tomar cuidado para não criar outro jogo por acidente ao tocar novamente no botão.  
+Após seguir os passos de execução do projeto e acesso a aplicação web, a tela inicial trará uma interface com um sudoku em branco, como mostrado na imagem abaixo: 
+
+Add imagem
+
+Para criar uma partida, basta clicar no botão **Novo Jogo**. Essa ação gerará uma partida automaticamente e de forma aleatória, apenas deve-se tomar cuidado para não criar outro jogo por acidente ao tocar novamente no botão.  
 ### Como jogar
-Com o novo jogo em mãos, clique nos quadrados vazios, que são possíveis editar para tentar solucionar o jogo seguindo as regras do Sudoku, completando todo o quadro 9x9 sem repetir números nas linhas, nas colunas e em cada quadro 3x3 menor. Todo quadrado editável pode ser mudado livremente durante o jogo e o botão **Limpar** apaga tudo aquilo que você escreveu, caso queira começar do zero.
+Com o novo jogo em mãos, clique nos quadrados vazios, que são possíveis editar para tentar solucionar o jogo seguindo as regras do Sudoku, completando todo o quadro 9x9 sem repetir números nas linhas, nas colunas e em cada quadro 3x3 menor. Todo quadrado editável pode ser mudado livremente durante o jogo e o botão **Limpar** apaga tudo aquilo que você escreveu, caso queira começar do zero. 
+
 ### Resolução e Verificação
-Por fim, se quiser verificar seu resultado, basta clicar em **Verificar** que uma mensagem será enviada, informando se o jogo está parcialmente correto, e você deixou ainda campos em brancos, se ele tem algum erro que fere as regras do Sudoku ou se está correto e você solucionou o puzzle. Além disso, o botão **Resolver** lhe dará o resultado correto daquele puzzle presente, mas também irá sobrescrever qualquer campo que foi editado. Quando acabar, basta apertar em **Novo Jogo** e começar de novo!
+Por fim, se quiser verificar seu resultado, basta clicar em **Verificar** que uma mensagem será enviada, informando se o jogo está parcialmente correto, e você deixou ainda campos em brancos, se ele tem algum erro que fere as regras do Sudoku ou se está correto e você solucionou o puzzle, como mostrado nas imagens abaixo: 
+
+add imagens 
+
+Além disso, o botão **Resolver** lhe dará o resultado correto daquele puzzle presente, mas também irá sobrescrever qualquer campo que foi editado. Quando acabar, basta apertar em **Novo Jogo** e começar de novo! 
+
+add imagem
 
 ## Divisões do Projeto (Quem realizou cada parte)
 ### Beatriz Montenegro
-Ficou responsável pela parte de integração da área de servidor e o código em C, ajudando na verificação na parte de threads também, integrando isso aos códigos em Python que chamavam os arquivos C.  
+Ficou responsável pela parte de integração da área de servidor e o código em C e verificação na parte de threads também, integrando isso aos códigos em Python que chamavam os arquivos C.  
 ### Fellype Fontes
 Trabalhou principalmente na parte de criação e verificação do puzzle no código C, estudando como o uso de diferentes threads poderiam representar mais ou menos desempenho para realização da validação do puzzle.
 ### Georgiana Maria
