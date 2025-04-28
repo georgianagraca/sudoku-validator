@@ -73,7 +73,8 @@ Para acessar a aplicação, é semelhante a execução usando docker, acessando 
 ### Criação de um Jogo
 Após seguir os passos de execução do projeto e acesso a aplicação web, a tela inicial trará uma interface com um sudoku em branco, como mostrado na imagem abaixo: 
 
-![tela_inicial](https://github.com/user-attachments/assets/4e84b926-f44e-44c3-9258-3659ef820bf8)
+![tela_inicial](https://github.com/user-attachments/assets/2b5fdd9e-57ed-4cb8-88e2-1ab85a13e996)
+
 
 Para criar uma partida, basta clicar no botão **Novo Jogo**. Essa ação gerará uma partida automaticamente e de forma aleatória, apenas deve-se tomar cuidado para não criar outro jogo por acidente ao tocar novamente no botão. 
 
